@@ -1,30 +1,30 @@
-// redeploy: 2026-02-25
+// api/storage.ts
+export const config = { runtime: "nodejs" };
 
-// api/storage.ts  (패키지 설치 없이 REST 호출 버전)
 export default async function handler(req: any, res: any) {
   const key = (req.query?.key as string) || "";
-  if (!key) return res.status(400).json({ error: "key is required" });
+  const debug = req.query?.debug === "1";
 
-  // ✅ Vercel KV / Upstash Redis 둘 다 지원
-  const base =
-    process.env.KV_REST_API_URL ||
-    process.env.UPSTASH_REDIS_REST_URL;
-
-  const token =
-    process.env.KV_REST_API_TOKEN ||
-    process.env.UPSTASH_REDIS_REST_TOKEN;
+  const base = process.env.KV_REST_API_URL;
+  const token = process.env.KV_REST_API_TOKEN;
 
   if (!base || !token) {
+    // ✅ 디버그 모드면 어떤 게 비었는지 보여줌
     return res.status(500).json({
       error: "kv_not_configured",
-      missing: {
-        KV_REST_API_URL: !process.env.KV_REST_API_URL,
-        KV_REST_API_TOKEN: !process.env.KV_REST_API_TOKEN,
-        UPSTASH_REDIS_REST_URL: !process.env.UPSTASH_REDIS_REST_URL,
-        UPSTASH_REDIS_REST_TOKEN: !process.env.UPSTASH_REDIS_REST_TOKEN,
-      },
+      ...(debug
+        ? {
+            has_KV_REST_API_URL: Boolean(process.env.KV_REST_API_URL),
+            has_KV_REST_API_TOKEN: Boolean(process.env.KV_REST_API_TOKEN),
+            // 참고로 다른 이름도 존재하는지 같이 체크(있어도 상관없음)
+            has_UPSTASH_REDIS_REST_URL: Boolean(process.env.UPSTASH_REDIS_REST_URL),
+            has_UPSTASH_REDIS_REST_TOKEN: Boolean(process.env.UPSTASH_REDIS_REST_TOKEN),
+          }
+        : {}),
     });
   }
+
+  if (!key) return res.status(400).json({ error: "key is required" });
 
   try {
     if (req.method === "GET") {
@@ -62,4 +62,3 @@ export default async function handler(req: any, res: any) {
     return res.status(500).json({ error: "internal_error", detail: String(e?.message || e) });
   }
 }
-
