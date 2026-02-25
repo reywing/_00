@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 const USE_CLOUD = true;
 
 /** 노션 워크스페이스 기본값 (URL ?w=값 없으면 이 이름 사용) */
-const DEFAULT_WORKSPACE = "AX 실증 예산 페이지";
+const DEFAULT_WORKSPACE = "AX-실증-예산";
 
 /** URL에 ?w=워크스페이스 추가 시, 여러 그룹을 분리해서 사용 가능 */
 const getWorkspaceId = () => {
