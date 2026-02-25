@@ -1,12 +1,27 @@
-// api/storage.ts
+// api/storage.ts  (패키지 설치 없이 REST 호출 버전)
 export default async function handler(req: any, res: any) {
   const key = (req.query?.key as string) || "";
   if (!key) return res.status(400).json({ error: "key is required" });
 
-  const base = process.env.KV_REST_API_URL;
-  const token = process.env.KV_REST_API_TOKEN;
+  // ✅ Vercel KV / Upstash Redis 둘 다 지원
+  const base =
+    process.env.KV_REST_API_URL ||
+    process.env.UPSTASH_REDIS_REST_URL;
+
+  const token =
+    process.env.KV_REST_API_TOKEN ||
+    process.env.UPSTASH_REDIS_REST_TOKEN;
+
   if (!base || !token) {
-    return res.status(500).json({ error: "kv_not_configured" });
+    return res.status(500).json({
+      error: "kv_not_configured",
+      missing: {
+        KV_REST_API_URL: !process.env.KV_REST_API_URL,
+        KV_REST_API_TOKEN: !process.env.KV_REST_API_TOKEN,
+        UPSTASH_REDIS_REST_URL: !process.env.UPSTASH_REDIS_REST_URL,
+        UPSTASH_REDIS_REST_TOKEN: !process.env.UPSTASH_REDIS_REST_TOKEN,
+      },
+    });
   }
 
   try {
@@ -25,6 +40,7 @@ export default async function handler(req: any, res: any) {
       if (typeof value !== "string") {
         return res.status(400).json({ error: "value(string) is required" });
       }
+
       const r = await fetch(`${base}/set/${encodeURIComponent(key)}`, {
         method: "POST",
         headers: {
