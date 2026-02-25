@@ -1,3 +1,5 @@
+// redeploy: 2026-02-25
+
 // api/storage.ts  (패키지 설치 없이 REST 호출 버전)
 export default async function handler(req: any, res: any) {
   const key = (req.query?.key as string) || "";
@@ -60,3 +62,4 @@ export default async function handler(req: any, res: any) {
     return res.status(500).json({ error: "internal_error", detail: String(e?.message || e) });
   }
 }
+
