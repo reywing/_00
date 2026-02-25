@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 /** =====[ 설정 ]===== */
 /** 개발(StackBlitz) 중에는 false → 배포(Vercel)에서 true로 변경 */
-const USE_CLOUD = false;
+const USE_CLOUD = true;
 
 /** 노션 워크스페이스 기본값 (URL ?w=값 없으면 이 이름 사용) */
 const DEFAULT_WORKSPACE = "AX-실증-예산";
